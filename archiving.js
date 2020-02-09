@@ -121,8 +121,8 @@ function getFormulaFromLine(line){
  * @param {Sheet} sheet 
  */
 function markToBeDeleted(sheet) {
-    let sh = activeSpreadSheet().getSheet('__TO_BE_DELETED__');
-    let l = getLastRowForColumn(sh.getRange('A:A')) + 1;
+    let sh = getSheet('__TO_BE_DELETED__');
+    let l = getLastRowForColumn(sh.getRange('A:A'), true) + 1;
     sh.getRange(l, 1).setValue(sheet.getName());
 }
 

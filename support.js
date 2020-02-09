@@ -212,10 +212,11 @@ function getSheetById(Id) {
 * @param {Range} col mono-dimensional range (column or row)
 * @return {Integer} the last non-empty position (stops when more than 50 empty position to allow
 * for "hole" in the data series)
+* if all position are empty, returns 0
 */
-function getLastRowForColumn(col) {
+function getLastRowForColumn(col, zeroForEmpty = false) {
   var values = col.getValues();
-  var lign = 0, lastNonEmpty = 0;
+  var lign = 0, lastNonEmpty = zeroForEmpty? -1: 0;
   while( lign < values.length ) { 
     if( values[lign] != "") {lastNonEmpty = lign}
     if(lign++ - lastNonEmpty > 50) {break}
