@@ -59,15 +59,21 @@ function exportToPdf(sheet) {
     // 1 create a new sheet
     let newSpreadSheet = SpreadsheetApp.create('___TEMP___SPREADSHEET_FOR_PDF');
     // 2 copy sheet to new spreadsheet, delete sheet1 which is first sheet
-    sheet.copyTo(newSpreadSheet);
+    let data = sheet.getDataRange();
+    let newSheet = activeSpreadSheet().insertSheet();
+    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
+    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_COLUMN_WIDTHS, false);    
+    newSheet.copyTo(newSpreadSheet);
     newSpreadSheet.deleteSheet(newSpreadSheet.getSheets()[0]);
+    activeSpreadSheet().deleteSheet(newSheet);
     // 3 create pdf from new spreadsheet, rename it like old sheet
     let pdfFolder = DriveApp.getFolderById(PDF_FOLDER);
     let pdfData = newSpreadSheet.getAs('application/pdf');
     let pdf = DriveApp.createFile(pdfData);
     pdfFolder.addFile(pdf);
     pdf.setName(sheet.getName());
-    // 6 delete new sheet and
+    // 6 delete temp sheet
     let tempFile = DriveApp.getFileById(newSpreadSheet.getId());
     DriveApp.removeFile(tempFile);
 
