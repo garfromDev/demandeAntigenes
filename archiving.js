@@ -59,8 +59,8 @@ function exportToPdf(sheet) {
     // 1 create a new sheet
     let newSpreadSheet = SpreadsheetApp.create('___TEMP___SPREADSHEET_FOR_PDF');
     // 2 copy sheet to new spreadsheet, delete sheet1 which is first sheet
+    let newSheet = sheet.copyTo(activeSpreadSheet());
     let data = sheet.getDataRange();
-    let newSheet = activeSpreadSheet().insertSheet();
     data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
     data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
     data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_COLUMN_WIDTHS, false);    
