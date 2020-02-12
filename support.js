@@ -294,9 +294,13 @@ function letterToColumn(letter)
 /**
  * Copy / paste the line of the active sheet as Value only (formula are lost)
  * @param {int} line 
+ * @param {color} : javascript color  for the text
  */
-function copyValueOnly(line) {
+function copyValueOnly(line, color=false) {
   var spreadsheet = SpreadsheetApp.getActive();
-  spreadsheet.getRange(`${line}:${line}`).activate();
-  spreadsheet.getRange(`${line}:${line}`).copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
+  let r = spreadsheet.getRange(`${line}:${line}`).activate();
+  r.copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
+  if(color){
+    r.setFontColor(color);
+  }
 };

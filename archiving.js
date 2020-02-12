@@ -2,6 +2,8 @@
 let PDF_FOLDER = "1P9IbI2fZRH6N_S2tVSeu02r9Q4mzFX8H";
 /// la colonne dans laquelle insérer le lien
 let COL_LINK = 1;
+/// la feuille récapitulatif
+let RECAP_SHEET = 'Récapitulatif demandes';
 
 
 /**
@@ -44,14 +46,9 @@ function archiveLine(line){
     if(!pdf){
         alert(`La génération du fichier pdf ${sheet.getName()} pour la ligne ${line} a échouée`);
     }
-    // 4 copy value from old line
-    copyValueOnly(line);
-    // 5 insert link to pdf
-    linkCell = activeSheet().getRange(line, COL_LINK);
-    addHyperlinkToCell(linkCell, pdf.getUrl());
-    // delete  old sheet
-    markToBeDeleted(sheet);
-    toast("Archivage terminé avec succès");
+   
+    markToBeDeleted(sheet, line, pdf.getUrl());
+    toast("Génération du pdf terminée avec succès, la page sera effacée automatiquement dans la nuit...");
 }
 
 
@@ -126,10 +123,12 @@ function getFormulaFromLine(line){
  * à la fin de la liste de la feuille __TO_BE_DELETED__
  * @param {Sheet} sheet 
  */
-function markToBeDeleted(sheet) {
+function markToBeDeleted(sheet, line, link) {
     let sh = getSheet('__TO_BE_DELETED__');
     let l = getLastRowForColumn(sh.getRange('A:A'), true) + 1;
     sh.getRange(l, 1).setValue(sheet.getName());
+    sh.getRange(l, 2).setValue(line);
+    sh.getRange(l, 3).setValue(link);
 }
 
 
@@ -138,23 +137,30 @@ function markToBeDeleted(sheet) {
  * This script must be run with admin right to override protections
  * it will delete all sheets whose name are listed in column A of 
  *  masqued sheet __TO_BE_DELETED__
+ * and transform line of recap into value only greyed line, with
+ * link to the pdf file
  */
 function deleteMarkedSheets() {
     let sh = getSheet('__TO_BE_DELETED__');
-    let names = sh.getRange('A:A').getValues();
+    let names = sh.getRange('A:C').getValues();
+    let recap = getSheet(RECAP_SHEET);
     var l = getLastRowForColumn(sh.getRange('A:A'))
     while(l > 0){
-        let name = names[l-1];
-        activeSpreadSheet().deleteSheet(getSheet(name));
+        let name = names[l-1][0];
+        let line = names[l-1][1];
+        let pdfLink = names[l-1][2];
+         // 4 copy value from old line
+        copyValueOnly(line, 'grey');
+        // 5 insert link to pdf
+        linkCell = recap.getRange(line, COL_LINK);
+        addHyperlinkToCell(linkCell, pdfLink);
+        // delete  old sheet
+        try{
+            activeSpreadSheet().deleteSheet(getSheet(name));
+        }catch{
+            // we do nothing because if the user click many time archiving,
+            // the line will be duplicated, and the sheet may have been already deleted
+        }
         sh.getRange(l--, 1).setValue("");
     }
 }
-
-
-function test() {
-    //var ssh = getSheetFromLine(10);
-    //alert(ssh.getName());
-    //archiveLine(15);
-    //copyValueOnly(10);
-  alert(getSheetNameFromLine(24));
-  }
