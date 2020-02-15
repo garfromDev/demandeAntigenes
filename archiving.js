@@ -162,6 +162,7 @@ function deleteMarkedSheets() {
             // we do nothing because if the user click many time archiving,
             // the line will be duplicated, and the sheet may have been already deleted
         }
-        sh.getRange(l--, 1).setValue("");
+        sh.getRange(l, 1, l, 3).setValue("");
+        l--;
     } //end while
 }
