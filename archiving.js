@@ -48,31 +48,16 @@ function archiveLine(line){
     }
    
     markToBeDeleted(sheet, line, pdf.getUrl());
-    toast("Génération du pdf terminée avec succès, la page sera effacée automatiquement dans la nuit...");
+    toast("Génération du pdf terminée avec succès, la page sera effacée automatiquement dans la nuit...", 5);
 }
 
 
 function exportToPdf(sheet) {
-    // 1 create a new sheet
-    let newSpreadSheet = SpreadsheetApp.create('___TEMP___SPREADSHEET_FOR_PDF');
-    // 2 copy sheet to new spreadsheet, delete sheet1 which is first sheet
-    let newSheet = sheet.copyTo(activeSpreadSheet());
-    let data = sheet.getDataRange();
-    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
-    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
-    data.copyTo(newSheet.getRange('A1'), SpreadsheetApp.CopyPasteType.PASTE_COLUMN_WIDTHS, false);    
-    newSheet.copyTo(newSpreadSheet);
-    newSpreadSheet.deleteSheet(newSpreadSheet.getSheets()[0]);
-    activeSpreadSheet().deleteSheet(newSheet);
-    // 3 create pdf from new spreadsheet, rename it like old sheet
+    // 3 create pdf from  sheet
     let pdfFolder = DriveApp.getFolderById(PDF_FOLDER);
-    let pdfData = newSpreadSheet.getAs('application/pdf');
+    let pdfData = sheetToPDF(activeSpreadSheet().getId(), sheet.getSheetId(), sheet.getName());
     let pdf = DriveApp.createFile(pdfData);
     pdfFolder.addFile(pdf);
-    pdf.setName(sheet.getName());
-    // 6 delete temp sheet
-    let tempFile = DriveApp.getFileById(newSpreadSheet.getId());
-    DriveApp.removeFile(tempFile);
 
     return pdf;
 }
